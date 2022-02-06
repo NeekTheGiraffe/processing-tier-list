@@ -1,15 +1,17 @@
 import java.util.ArrayList;
 import java.io.File;
 
-final int TIER_MARGIN = 20;
-final int TIER_LABEL_SIZE = 100;
-final int TIER_ITEM_SIZE = 100;
-final int TEXT_OFFSET = 15;
-final int WIDTH = 1000;
+final double SCALE = 0.7;
+
+final int TIER_MARGIN = (int)(20 * SCALE);
+final int TIER_LABEL_SIZE = (int)(100 * SCALE);
+final int TIER_ITEM_SIZE = (int)(100 * SCALE);
+final int TEXT_OFFSET = (int)(15 * SCALE);
+final int WIDTH = (int)(1000 * SCALE);
 
 PFont f;
 
-String path = "C:/Users/npavl/Desktop/TierListMaker Resources/pasta";
+String path = "C:\\Users\\npavl\\Documents\\Development\\processing\\resources\\professors";
 File imageDir = new File(path);
 String[] imageList = imageDir.list();
 
@@ -39,6 +41,7 @@ void setup() {
   addTier("C", 104, 201, 0);
   addTier("D", 6, 112, 212);
   addTier("F", 87, 0, 217);
+  
   for (String imageName : imageList) {
     ntb.addItemFromImage(loadImage(path + "/" + imageName));
   }
