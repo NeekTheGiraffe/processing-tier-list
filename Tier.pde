@@ -1,71 +1,73 @@
-class Tier extends Bucket {
+public class Tier extends ForwardingContainer {
   
-  String name;
-  int r,g,b;
+  public static final int MARGIN = 20;
   
-  int labelX;
-  int labelY;
-  int labelWidth;
-  int labelHeight;
-  //int bucketX;
-  //int bucketY;
-  //int bucketWidth;
-  //int bucketHeight;
-  int textX;
-  int textY;
-  int textOffset;
-  //int itemsPerRow;
+  private final String _name;
+  private final color _col;
   
-  Tier(String name, int r, int g, int b) {
-    this.name = name;
-    this.r = r;
-    this.g = g;
-    this.b = b;
+  private float _x, _y, _w;
+  
+  public Tier(String name, color c, float x, float y, float w, float minHeight)
+  {
+    super(new Bucket(x + minHeight + MARGIN, y, w - minHeight - MARGIN, minHeight));
+    _x = x;
+    _y = y;
+    _w = w;
+    _col = c;
+    _name = name;
+  }
+  
+  @Override public float x() { return _x; }
+  @Override public void setX(float x) { _x = x; super.setX(_bucketX()); }
+  @Override public float y() { return _y; }
+  @Override public void setY(float y) { _y = y; super.setY(_y); }
+  @Override public float width() { return _w; }
+  @Override public void setWidth(float w) { _w = w; super.setWidth(_bucketW()); }
+  
+  @Override
+  public void display() {
     
-    textOffset = TEXT_OFFSET;                        //How far down to move the text for it to look pretty
-    labelX = TIER_MARGIN;                            //X of the top left corner of the tier label (where the letter goes)
-    labelWidth = TIER_LABEL_SIZE;                    //Side length of the tier label
-    bucketX = TIER_MARGIN * 2 + TIER_LABEL_SIZE;     //X of the top left corner of the bucket (where tier items go)
-    bucketWidth = width - TIER_MARGIN - bucketX;     //Width of the bucket
-    itemsPerRow = bucketWidth / TIER_ITEM_SIZE;      //The number of tier items that can fit into one row
-    textX = labelX + labelWidth / 2;                 //X position of tier letter
-    
-    setY(getBucketYByIndex(tiers.size()));
-    updateBucketHeight();
-  }
-  
-  void setY(int y) {
-    bucketY = y;                                     //Y of the top left corner of the bucket
-    labelY = y;                                      //Y of the top left corner of the tier label
-  }
-  
-  void updateTextY() {
-    textY = labelY + labelHeight / 2 + textOffset;   //Y position of tier letter
-  }
-  
-  void updateBucketHeight() {
-    super.updateBucketHeight();
-    labelHeight = bucketHeight;
-    updateTextY();
-  }
-  
-  void updateBucketHeightNoShrink() {
-    super.updateBucketHeightNoShrink();
-    labelHeight = bucketHeight;
-    updateTextY();
-  }
-  
-  void display() {
+    // Draw the tier box
+    stroke(0);
+    strokeWeight(1);
     rectMode(CORNER);
-    fill(r, g, b);
-    rect(labelX, labelY, labelWidth, labelHeight);
+    fill(_col);
+    rect(_x, _y, minHeight(), height());
     
-    fill(70);
-    rect(bucketX, bucketY, bucketWidth, bucketHeight);
+    // Bucket
+    super.display();
     
+    // Tier letter
     textAlign(CENTER);
-    if (r + g + b > 600) fill(0);
+    if (red(_col) + green(_col) + blue(_col) > 600) fill(0);
     else fill(255);
-    text(this.name, textX, textY);
+    text(_name, _x + 0.5*minHeight(), _y + 0.5*height() + 0.5*textAscent());
   }
+  
+  @Override public boolean contains(float x, float y) { return contains(x, y, 0f); }
+  @Override public boolean contains(float x, float y, float padding) {
+    if (x < _x - padding || x > _x + _w + padding) return false;
+    if (y < _y - padding || y > _y + height() + padding) return false;
+    return true;
+  }
+  
+  @Override
+  public String toString() {
+    StringBuilder bld = new StringBuilder();
+    return bld.append("Tier{name=").append(_name).append('}').toString();
+  }
+  
+  //
+  // ---- Encapsulated methods ----
+  //
+  
+  public boolean bucketContains(float x, float y) { return super.contains(x, y); }
+  public boolean bucketContains(float x, float y, float padding) { return super.contains(x, y, padding); }
+  
+  //
+  // ---- Private methods ----
+  //
+  
+  private float _bucketX() { return _x + minHeight() + MARGIN; }
+  private float _bucketW() { return _w - minHeight() - MARGIN; }
 }
